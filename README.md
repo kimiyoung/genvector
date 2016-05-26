@@ -80,9 +80,6 @@ tar zxvf my_data.tar.gz
 
 Otherwise, you can run the script `prep_data.py` to do the preprocessing. Note that `prep_data.py` has dependencies on [gensim](http://radimrehurek.com/gensim/install.html).
 Running `prep_data.py` can take up to 25GB memory and 30 minutes. (Therefore directly downloading the above files is suggested.)
-```
-python prep_data.py
-```
 
 ## Training
 
