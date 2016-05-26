@@ -1,3 +1,4 @@
+#pragma once
 
 const char * KEYWORD_INDEX = "keyword_index.out";
 const char * AUTHOR_INDEX = "author_index.out";
