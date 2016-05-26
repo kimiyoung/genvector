@@ -8,32 +8,16 @@
 
 using namespace std;
 
-bool comp(const pair<int, float> p1, const pair<int, float> p2) {
-    return p1.second > p2.second;
-}
-
-char temp_[50];
-
 int main() {
-    int D, W;
-    document * docs;
-    float ** f_r, ** f_k;
+    int D, W; // D: number of documents (authors), W: number of words
+    document * docs; // document arrays
+    float ** f_r, ** f_k; // f_r: author embeddings, f_k: keyword embeddings
 
-    read_data(D, W, docs, f_r, f_k);
+    read_data(D, W, docs, f_r, f_k); // read the data
 
-    model m(docs, D, W, f_r, f_k);
+    model m(docs, D, W, f_r, f_k); // initialize the model
 
-    FILE * fin, * fout;
-    fin = fopen(KEYWORD_INDEX, "r");
+    m.learn(); // training
 
-    char ** keyword = new char * [W];
-    for (int i = 0; i < W; i ++) {
-        keyword[i] = new char[50];
-        fscanf(fin, "%s", keyword[i]);
-    }
-    fclose(fin);
-
-    m.learn();
-
-    m.save_model(SAVED_MODEL_FILE);
+    m.save_model(SAVED_MODEL_FILE); // save model to file
 }

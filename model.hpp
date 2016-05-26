@@ -15,19 +15,23 @@ using namespace std;
 
 char temp[200];
 
+// for debugging, assert valid numbers
 #define ASSERT_VALNUM(x) assert(! isnan(x) && ! isinf(x));
 
+// computing constants for speedup purpose
 const float LOG_2_PI = log2(atan(1) * 8);
 const float _2_PI = atan(1) * 8;
 const float LOG_INV_2_PI = log2(1.0 / (atan(1) * 8));
 const float LOG_2_EXP = log2(exp(1.0));
 
+/* data structure for a document.
+*/
 class document {
 public:
-    int r_id;
-    int w_cnt;
-    int * w_id;
-    int * w_freq;
+    int r_id; // author index
+    int w_cnt; // word cnts
+    int * w_id; // int array of length w_cnt, each entry is a keyword index
+    int * w_freq; // int array of length w_cnt, each entry w_freq[i] is the frequency of w_id[i] in this document.
 };
 
 inline float log_gamma_ratio(float x1, float x2) {
@@ -36,6 +40,8 @@ inline float log_gamma_ratio(float x1, float x2) {
     return u * 0.5 * log2(n * n + (1 - u * u) / 12);
 }
 
+/* multinomial sampling
+*/
 inline int uni_sample(float * p, int len) {
     float sum = 0;
     for (int i = 0; i < len; i ++) sum += p[i];
@@ -47,6 +53,8 @@ inline int uni_sample(float * p, int len) {
     return len - 1;
 }
 
+/* multinomial sampling in log scale
+*/
 inline int log_uni_sample(float * p, int len) {
     static const float MIN_FLOAT = -1e30;
     static const float BIG_FLOAT = 100.0f;
@@ -67,6 +75,8 @@ inline int log_uni_sample(float * p, int len) {
     return uni_sample(p, len);
 }
 
+/* compute Gaussian density probability in log scale
+*/
 inline float log_gaussian(float x, float mu, float lambda) {
     float ret = LOG_INV_2_PI + 0.5 * log2(lambda) + (-lambda * 0.5 * (x - mu) * (x - mu))* LOG_2_EXP;
     ASSERT_VALNUM(ret);
@@ -109,9 +119,9 @@ public:
 
     float lr_r = 1e-3, lr_k = 1e-6; // learning rate for embedding update
     const float decay = 0.5;
-    const int emb_max_iter = 20;
+    const int emb_max_iter = 20; // iterations for embedding update
 
-    const int learning_max_iter = 3;
+    const int learning_max_iter = 3; // maximum iterations for iterating between topic sampling and embedding update
 
     float * llh_temp;
 
@@ -192,7 +202,8 @@ public:
 
         delete [] sum_m;
     }
-
+ 
+    // save model to file
     void save_model(const char * filename = "model.save.txt") {
         FILE * fout = fopen(filename, "w");
         fprintf(fout, "%d %d\n", D, W);
@@ -226,6 +237,7 @@ public:
         fclose(fout);
     }
 
+    // load model from file
     void load_model(const char * filename) {
 
         FILE * fin = fopen(filename, "r");
@@ -261,6 +273,7 @@ public:
         fclose(fin);
     }
 
+    // initialize the model. called by constructor only.
     void model_init() {
         srand(0);
 
@@ -374,6 +387,7 @@ public:
 
         model_init();
 
+        // load file if filename is specified
         if (filename) {
             load_model(filename);
         }
@@ -395,6 +409,7 @@ public:
         logging("model init done");
     }
 
+    // update the author-related statistics. these statistics will be used for sampling.
     void stat_r_update() {
         memset(n_r_t, 0, sizeof (int) * T);
         for (int i = 0; i < T; i ++) {
@@ -411,6 +426,7 @@ public:
         }
     }
 
+    // update the keyword-related statistics. these statistics will be used for sampling.
     void stat_k_update() {
         for (int i = 0; i < D; i ++) memset(n_d_t[i], 0, sizeof(int) * T);
         for (int i = 0; i < W; i ++) memset(n_w_t[i], 0, sizeof(int) * T);
@@ -436,6 +452,7 @@ public:
         }
     }
 
+    // compute the log likelihood.
     inline float log_likelihood() {
         float llh = 0.0;
 
@@ -486,6 +503,7 @@ public:
         return llh;
     }
 
+    // read out parameters
     void read_out() {
         read_out_cnt ++;
 
@@ -552,6 +570,7 @@ public:
         }
     }
 
+    // normalize read-outs
     void norm_read_out() {
         #pragma omp parallel for num_threads(64)
         for (int i = 0; i < D; i ++) {
@@ -654,7 +673,6 @@ public:
     void sample_topics(int iter = -1) {
 
         float p[T];
-        // float p2[T];
 
         iter = iter == -1 ? samp_topic_max_iter : iter;
         for (int i = 0; i < iter; i ++) {
@@ -693,35 +711,16 @@ public:
                     for (int l = 0; l < T; l ++) {
                         float temp_p = n_d_t[j][y_d[j]] + (l == y_d[j]) * w_freq + laplace;
                         temp_p += n_d_t[j][l] + alpha;
-                        // temp_p *= n_d_t[j][l] + alpha;
                         temp_p = log2(temp_p) * multi_magnifier;
-
-                        // if (j == 0 && k == 0 && l == 0)
-                        // cout << "log y|z = " << temp_p;
-
                         temp_p += g_t(l, n_k_t, w_freq) * E_k;
-                        // p2[l] = g_t(l, n_k_t, w_freq) * E_k;
 
                         for (int m = 0; m < E_k; m ++) {
                             temp_p += g(l, m, f_k_w[w_id][m], n_k_t, sum_k, sqr_k, w_freq);
-                            // p2[l] += g(l, m, f_k_w[w_id][m], n_k_t, sum_k, sqr_k, w_freq);
                         }
 
-                        // if (j == 0 && k == 0 && l == 0)
-                        // cout << "\t log final = " << temp_p << endl;
                         ASSERT_VALNUM(temp_p);
                         p[l] = temp_p;
                     }
-                    // if (j == 0 && k == 0) {
-                    //     for (int l = 0; l < T; l ++) {
-                    //         cout << " " << p[l];
-                    //     }
-                    //     cout << endl;
-                    //     for (int l = 0; l < T; l ++) {
-                    //         cout << " " << p2[l];
-                    //     }
-                    //     cout << endl;
-                    // }
                     z_d_m[j][k] = log_uni_sample(p, T);
                     set_k_topic(j, k, z_d_m[j][k], true, false);
                 }
