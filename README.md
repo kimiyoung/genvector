@@ -13,7 +13,7 @@ outperforms state-of-the-art methods in the task of learning social knowledge gr
 
 ## Datasets
 
-The dataset can be downloaded [here](https://static.aminer.org/lab-datasets/genvector/data.tar.gz). Please extract the compressed file and
+The dataset can be downloaded [here](https://static.aminer.org/lab-datasets/genvector/data.tar.gz) (8.3G). Please extract the compressed file and
 put the directory `data` as an immediate sub-directory of `genvector` (the current directory).
 ```
 wget https://static.aminer.org/lab-datasets/genvector/data.tar.gz
@@ -71,7 +71,7 @@ accessed using `author_id`.
 
 ## Preprocessing
 
-You can directly download the preprocessed data files that are prepared for our model [here](https://static.aminer.org/lab-datasets/genvector/my_data.tar.gz).
+You can directly download the preprocessed data files that are prepared for our model [here](https://static.aminer.org/lab-datasets/genvector/my_data.tar.gz) (110M).
 Please extract the compressed file and put the directory `my_data` as an immediate sub-directory of `genvector` (the current directory).
 ```
 wget https://static.aminer.org/lab-datasets/genvector/my_data.tar.gz
