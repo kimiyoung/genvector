@@ -111,7 +111,7 @@ public:
     const float decay = 0.5;
     const int emb_max_iter = 20;
 
-    const int learning_max_iter = 1;
+    const int learning_max_iter = 3;
 
     float * llh_temp;
 
@@ -785,16 +785,13 @@ public:
     }
 
     void learn() {
+        sample_topics();
+
+
         for (int i = 0; i < learning_max_iter; i ++) {
-            sprintf(temp, "##### learning #%d #####", i);
-            logging(temp);
-
+            embedding_update();
             sample_topics();
-
-            // embedding_update();
         }
-
-        parameter_update();
     }
 
     float predict(int r_id, int w_id, int j) {
@@ -805,17 +802,11 @@ public:
             float cur = 0.0;
             for (int j = 0; j < E_r; j ++)
                 cur += log_gaussian(f_r_d[r_id][j], mu_r_t[i][j], lambda_r_t[i][j]);
-            if (r_id == 0 && i == 0) cout << cur << endl;
             for (int j = 0; j < E_k; j ++)
                 cur += log_gaussian(f_k_w[w_id][j], mu_k_t[i][j], lambda_k_t[i][j]);
-            if (r_id == 0 && i == 0) cout << cur << endl;
-            // cur = fastpow2(cur) * theta_d_t[r_id][i];
             cur += log2(theta_d_t[r_id][i]) * multi_magnifier;
             cur += log2(1.0 * docs[r_id].w_freq[j] / sum_m[r_id]) * multi_magnifier;
-            if (r_id == 0 && i == 0) cout << cur << endl;
-            if (r_id == 0 && i == 0) cout << "======" << endl;
             ASSERT_VALNUM(cur);
-            // prob += cur;
             prob = max(prob, cur);
         }
         return prob;

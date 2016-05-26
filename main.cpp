@@ -33,16 +33,7 @@ int main() {
     }
     fclose(fin);
 
-    m.sample_topics();
-    m.save_model(SAVED_MODEL_FILE);
-    for (int t = 0; t < 3; t ++) {
-        m.embedding_update();
-        m.sample_topics();
-        m.embedding_update();
-        m.sample_topics();
-        m.embedding_update();
-        m.sample_topics();
-    }
+    m.learn();
 
     m.save_model(SAVED_MODEL_FILE);
 }
