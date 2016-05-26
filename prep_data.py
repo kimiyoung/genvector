@@ -25,7 +25,7 @@ def select(bulk_info):
             strs.append(line.strip())
 
     bulk_no, bulk_size = bulk_info
-    fout = open('pair.select.%d.txt' % bulk_no, 'w')
+    fout = open('my_data/pair.select.%d.txt' % bulk_no, 'w')
     for i in range(bulk_size * bulk_no, min(len(strs), bulk_size * (bulk_no + 1))):
         if i % 1000 == 0:
             logging.info('selecting %d/%d in thread %d' % (i, bulk_size, bulk_no))
@@ -58,22 +58,22 @@ def select_():
     pool.map(select, [(i, bulk_size) for i in range(CORE_NUM)])
 
 def merge():
-    fout = open('pair.select.txt', 'w')
+    fout = open('my_data/pair.select.txt', 'w')
     for i in range(16):
-        for line in open('pair.select.%d.txt' % i):
+        for line in open('my_data/pair.select.%d.txt' % i):
             fout.write(line)
     fout.close()
     for i in range(16):
-        os.system('rm pair.select.{}.txt'.format(i))
+        os.system('rm my_data/pair.select.{}.txt'.format(i))
 
 def sample():
     target_authors = set()
     for line in open(SAMPLE_ID_FILE):
         target_authors.add(line.strip())
 
-    fout = open('sample.pair.select.txt', 'w')
+    fout = open('my_data/sample.pair.select.txt', 'w')
     temp_list = []
-    for line in open('pair.select.txt'):
+    for line in open('my_data/pair.select.txt'):
         temp_list.append((line, len(line.strip().split(';'))))
     temp_list.sort(key = lambda x: x[1], reverse = True)
 
@@ -81,12 +81,12 @@ def sample():
         if line.strip().split(';')[0] in target_authors:
             fout.write(line)
 
-    os.system('rm pair.select.txt')
+    os.system('rm my_data/pair.select.txt')
 
 def indexing(model):
     authors, keywords = set(), set()
     cnt = 0
-    for line in open('sample.pair.select.txt'):
+    for line in open('my_data/sample.pair.select.txt'):
         if cnt % 10000 == 0:
             logging.info('indexing %d' % cnt)
         cnt += 1
@@ -96,11 +96,11 @@ def indexing(model):
         authors.add(inputs[0])
         for j in range(1, len(inputs)):
             keywords.add(inputs[j].split(',')[0])
-    fout = open('author_index.out', 'w')
+    fout = open('my_data/author_index.out', 'w')
     for i, author in enumerate(authors):
         fout.write(author + '\n')
     fout.close()
-    fout = open('keyword_index.out', 'w')
+    fout = open('my_data/keyword_index.out', 'w')
     for i, keyword in enumerate(keywords):
         fout.write(keyword + '\n')
     fout.close()
@@ -108,19 +108,19 @@ def indexing(model):
 def format(a_model):
     authors, keywords = [], []
     author2id, keyword2id = {}, {}
-    for i, line in enumerate(open('author_index.out')):
+    for i, line in enumerate(open('my_data/author_index.out')):
         author = line.strip()
         authors.append(author)
         author2id[author] = i
-    for i, line in enumerate(open('keyword_index.out')):
+    for i, line in enumerate(open('my_data/keyword_index.out')):
         keyword = line.strip()
         keywords.append(keyword)
         keyword2id[keyword] = i
 
-    fout = open('data.main.txt', 'w')
+    fout = open('my_data/data.main.txt', 'w')
     fout.write("%d %d\n" % (len(authors), len(keywords)))
     cnt = 0
-    for line in open('sample.pair.select.txt'):
+    for line in open('my_data/sample.pair.select.txt'):
         if cnt % 10000 == 0:
             logging.info('printing author %d' % cnt)
         cnt += 1
@@ -134,7 +134,7 @@ def format(a_model):
     fout.close()
 
     model = gensim.models.Word2Vec.load(KEYWORD_MODEL)
-    fout = open('data.embedding.keyword.txt', 'w')
+    fout = open('my_data/data.embedding.keyword.txt', 'w')
     for i, keyword in enumerate(keywords):
         if i % 10000 == 0:
             logging.info('printing keyword %d/%d' % (i, len(keywords)))
@@ -147,7 +147,7 @@ def format(a_model):
     fout.close()
 
     model = a_model
-    fout = open('data.embedding.researcher.txt', 'w')
+    fout = open('my_data/data.embedding.researcher.txt', 'w')
     for i, author in enumerate(authors):
         if i % 10000 == 0:
             logging.info('printing author %d/%d' % (i, len(authors)))
@@ -161,11 +161,11 @@ def format(a_model):
 
 def cnt_pair():
     cnt = 0
-    for line in open('sample.pair.select.txt'):
+    for line in open('my_data/sample.pair.select.txt'):
         inputs = line.strip().split(';')
         cnt += len(inputs) - 1
     print cnt
-    os.system('rm sample.pair.select.txt')
+    os.system('rm my_data/sample.pair.select.txt')
 
 if __name__ == '__main__':
     logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
