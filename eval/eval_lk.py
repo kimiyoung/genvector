@@ -2,6 +2,11 @@
 MODEL_FILE = '../my_data/model.predict.txt'
 LABEL_FILE = '../data/lk_test.txt'
 
+def match(k1, ks):
+    for k2 in ks:
+        if k1 in k2 or k2 in k1: return True
+    return False
+
 author2words = {}
 for line in open(MODEL_FILE):
     inputs = line.strip().split(',')
@@ -19,7 +24,7 @@ for i, line in enumerate(open(LABEL_FILE)):
     pos_cnt, neg_cnt = 0, 0
 
     for keyword in author2words[author][: 5]:
-        if fuzzy_match(keyword, keywords):
+        if match(keyword, keywords):
             pos_cnt += 1
         else:
             neg_cnt += 1
