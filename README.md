@@ -136,5 +136,5 @@ python eval_lk.py
 1. We code needs further documentation and command line arguments support. We will update the code repo in the near future. You might also
 contribute to the code base if interested :)
 
-1. Like our repo and/or cite our paper if you like it :)
+1. Star our repo and/or cite our paper if you find it useful :)
 
