@@ -74,6 +74,10 @@ def sample():
     fout = open('sample.pair.select.txt', 'w')
     temp_list = []
     for line in open('pair.select.txt'):
+        temp_list.append((line, len(line.strip().split(';'))))
+    temp_list.sort(key = lambda x: x[1], reverse = True)
+
+    for line, _ in temp_list:
         if line.strip().split(';')[0] in target_authors:
             fout.write(line)
 
@@ -161,12 +165,13 @@ def cnt_pair():
         inputs = line.strip().split(';')
         cnt += len(inputs) - 1
     print cnt
+    os.system('rm sample.pair.select.txt')
 
 if __name__ == '__main__':
     logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
     model = gensim.models.Word2Vec.load(AUTHOR_MODEL)
-    select_()
-    merge()
+    # select_()
+    # merge()
     sample()
     indexing(model)
     format(model)
