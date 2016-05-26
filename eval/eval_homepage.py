@@ -1,5 +1,5 @@
 
-MODEL_FILE = '../model.predict.txt'
+MODEL_FILE = '../my_data/model.predict.txt'
 LABEL_FILE = '../data/homepage_test.txt'
 
 author2words = {}
