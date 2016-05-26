@@ -130,8 +130,7 @@ python eval_lk.py
 
 1. Our implementation leverages [fastapprox](https://github.com/Nigh/fastapprox) for efficient computation of `log`, `pow`, and `exp`.
 
-1. We code needs further documentation and command line arguments support. We will update the code repo in the near future. You might also
-contribute to the code base if interested :)
+1. Our code needs further documentation and command line arguments support. We will update the code repo in the near future. You are also welcome to contribute to the code base :)
 
 1. Star our repo and/or cite our paper if you find it useful :)
 
