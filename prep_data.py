@@ -11,8 +11,8 @@ import os
 import numpy as np
 import json
 
-AUTHOR_MODEL = 'online.author_word.model'
-KEYWORD_MODEL = 'keyword.model'
+AUTHOR_MODEL = 'data/online.author_word.model'
+KEYWORD_MODEL = 'data/keyword.model'
 PAIR_PREFIX = 'data/gen_pair'
 SAMPLE_ID_FILE = 'data/sample_id.txt'
 
