@@ -1,9 +1,7 @@
 
-import pymongo
 from collections import defaultdict as dd
 import multiprocessing
 import logging
-from bson.objectid import ObjectId
 import time
 import gensim
 import random
