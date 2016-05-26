@@ -169,6 +169,8 @@ def cnt_pair():
 
 if __name__ == '__main__':
     logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
+    if not os.path.exists('my_data'):
+        os.makedirs('my_data')
     model = gensim.models.Word2Vec.load(AUTHOR_MODEL)
     select_()
     merge()
