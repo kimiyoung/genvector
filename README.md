@@ -71,6 +71,8 @@ accessed using `author_id`.
 
 ## Preprocessing
 
+If you would like to develop and test your method on our datasets, you can skip this section. However, if you would like to run the GenVector model, you need to follow the instructions in this section to preprocess the data into a specific format.
+
 You can directly download the preprocessed data files that are prepared for our model [here](https://static.aminer.org/lab-datasets/genvector/my_data.tar.gz) (110M).
 Please extract the compressed file and put the directory `my_data` as an immediate sub-directory of `genvector` (the current directory).
 ```
