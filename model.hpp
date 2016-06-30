@@ -546,7 +546,7 @@ public:
 
                 float alpha_n = alpha_0 + 0.5 * n;
                 float beta_n = beta_0 + 0.5 * variance + 
-                    kappa_0 * n * (mean - mu_0) * (mean - mu_0) * 0.5 * (kappa_0 + n);
+                    kappa_0 * n * (mean - mu_0) * (mean - mu_0) * 0.5 / (kappa_0 + n);
 
                 lambda_r_t[i][j] = alpha_n / beta_n;
             }
@@ -563,7 +563,7 @@ public:
 
                 float alpha_n = alpha_0 + 0.5 * n;
                 float beta_n = beta_0 + 0.5 * variance +
-                    kappa_0 * n * (mean - mu_0) * (mean - mu_0) * 0.5 * (kappa_0 + n);
+                    kappa_0 * n * (mean - mu_0) * (mean - mu_0) * 0.5 / (kappa_0 + n);
 
                 lambda_k_t[i][j] = alpha_n / beta_n;
             }
@@ -655,7 +655,7 @@ public:
         float variance = n > 0 ? sqr_r[t][e] - sum_r[t][e] * sum_r[t][e] / n : 0;
 
         float beta_n_pr = beta_0 + 0.5 * variance +
-            kappa_0 * n * (mean - mu_0) * (mean - mu_0) * 0.5 * (kappa_0 + n);
+            kappa_0 * n * (mean - mu_0) * (mean - mu_0) * 0.5 / (kappa_0 + n);
 
         n += dn;
         float sum = sum_r[t][e] + f * dn;
@@ -664,7 +664,7 @@ public:
         variance = sqr - sum * sum / n;
 
         float beta_n = beta_0 + 0.5 * variance + 
-            kappa_0 * n * (mean - mu_0) * (mean - mu_0) * 0.5 * (kappa_0 + n);
+            kappa_0 * n * (mean - mu_0) * (mean - mu_0) * 0.5 / (kappa_0 + n);
 
         float ret = (n + alpha_0) * fasterlog2(beta_n_pr) - (n + dn + alpha_0) * fasterlog2(beta_n);
         return ret;
