@@ -7,4 +7,4 @@ predict: predict.cpp
 	g++ -o predict predict.cpp -std=c++11 -fopenmp -O3
 
 clean:
-	rm main
+	rm main predict
